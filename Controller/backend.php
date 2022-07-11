@@ -26,6 +26,7 @@ class Backend{
         return $arr;
     }
 
+<<<<<<< HEAD
     //function to select one or more column in the database
     function findOne($tableName, $columnName, $key=null, $value= null){
         $set = Array(); 
@@ -64,6 +65,9 @@ class Backend{
         
         return $t;
     }
+=======
+    
+>>>>>>> e897ebd6964ddf71807543a53fe3db5e09f59e0d
 }
 
 $b = new Backend();
