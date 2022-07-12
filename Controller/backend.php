@@ -11,11 +11,19 @@ class Backend{
 
     //function to get all data or get a rows
     //the id is optional here
-    function findAll($tableName, $key=null, $value= null){
+    function findAll($tableName, $key=null, $value= null, $order='asc', $numRow=0){
         if(is_null($value)){
-            $data = $this->db->query("select * from ".$tableName."");
+			if($numRow > 0){
+				$data = $this->db->query("select * from ".$tableName." order by ".$order." limit ".$numRow." ");
+			}else{
+				$data = $this->db->query("select * from ".$tableName." order by ".$order." ");
+			}
         }else{
-            $data = $this->db->query("select * from ".$tableName." where ".$key."=".$value."");
+			if($numRow > 0){
+				$data = $this->db->query("select * from ".$tableName." where ".$key."=".$value." order by ".$order." limit ".$numRow." ");
+			}else{
+				$data = $this->db->query("select * from ".$tableName." where ".$key."=".$value." order by ".$order." ");
+			}  
         }
         
         $arr = Array();
