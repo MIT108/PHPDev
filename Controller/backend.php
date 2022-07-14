@@ -9,71 +9,99 @@ class Backend{
         $this->db = connect_to_db();
     }
 
+    
+    //=====================================================================================================//
+//*******************************  Beginning of select functions  **************************************/
+//=====================================================================================================//
+
     //function to get all data or get a rows
     //the id is optional here
-    function findAll($tableName, $key=null, $value= null, $order='asc', $numRow=0){
-        if(is_null($value)){
-			if($numRow > 0){
-				$data = $this->db->query("select * from ".$tableName." order by ".$order." limit ".$numRow." ");
-			}else{
-				$data = $this->db->query("select * from ".$tableName." order by ".$order." ");
-			}
-        }else{
-			if($numRow > 0){
-				$data = $this->db->query("select * from ".$tableName." where ".$key."=".$value." order by ".$order." limit ".$numRow." ");
-			}else{
-				$data = $this->db->query("select * from ".$tableName." where ".$key."=".$value." order by ".$order." ");
-			}  
+    function findAll($tableName, $key=null, $value= null){
+        try{
+            if(is_null($value)){
+                $data = $this->db->query("select * from ".$tableName."");
+            }else{
+                $data = $this->db->query("select * from ".$tableName." where ".$key."=".$value."");
+            }
+            
+            $arr = Array();
+            foreach ($data as $row){
+                array_push($arr,$row);
+            }
+    
+            return $arr;
+        }catch(Exception $e){
+            return $this->returnExecQueryMessage("Unexpected server error could not fine the data", false);
         }
-        
-        $arr = Array();
-        foreach ($data as $row){
-            array_push($arr,$row);
-        }
-
-        return $arr;
+       
     }
 
     //function to select one or more column in the database
     function findOne($tableName, $columnName, $key=null, $value= null){
         $set = Array(); 
-        for($i=0; $i<count($columnName); $i++){
-            if(is_null($value)){
-                $data = $this->db->query("select ".$columnName[$i]." from ".$tableName."");    
-            }else{
-                $data = $this->db->query("select ".$columnName[$i]." from ".$tableName." where ".$key."=".$value."");
+        try{
+            for($i=0; $i<count($columnName); $i++){
+                if(is_null($value)){
+                    $data = $this->db->query("select ".$columnName[$i]." from ".$tableName."");    
+                }else{
+                    $data = $this->db->query("select ".$columnName[$i]." from ".$tableName." where ".$key."=".$value."");
+                }
+                
+                foreach ($data as $row){
+                    array_push($set,$row);
+                }
             }
             
-            foreach ($data as $row){
-                array_push($set,$row);
-            }
+            return $set;
+        }catch(Exception $e){
+            return $this->returnExecQueryMessage("Unexpected server error could not fine the data", false);
         }
         
-        return $set;
     }
 
     //function to verify if a table exit
     function checkTables($tableName){
-        $data=$this->db->query("show tables");
-        $arr=Array();
-        $i=0;
-        $t=false;
-
-        foreach($data as $row){
-            array_push($arr,$row);
-            $i++;
-        }
-
-        for($j=0; $j<$i; $j++){
-            if($tableName==$arr[$j][0]){
-                $t=true;
+        try{
+            $data=$this->db->query("show tables");
+            $arr=Array();
+            $i=0;
+            $t=false;
+    
+            foreach($data as $row){
+                array_push($arr,$row);
+                $i++;
             }
+    
+            for($j=0; $j<$i; $j++){
+                if($tableName==$arr[$j][0]){
+                    $t=true;
+                }
+            }
+            
+            return $t;
+        }catch(Exception $e){
+            return $this->returnExecQueryMessage("An Error occured doing verification", false);
         }
-        
-        return $t;
+       
     }
 
-    //=====================================================================================================//
+    //function to verify if an id in a table exist
+    function isExistId($tableName,$key,$value){
+        try{
+
+            $data = $this->db->query("select count(".$key.") from ".$tableName." where ".$key."= '$value' as count_value");
+            foreach ($data as $key) {
+                if($key['count_value'] > 0){
+                    return $this->returnExecQueryMessage("$value in $key found sucessfully", true);
+                }
+            }
+
+        }catch(Exception $e){
+            return $this->returnExecQueryMessage("Oops the $key ".$value." doesn't exist in the $tableName table", false);
+        }
+    }
+
+//=====================================================================================================//
 //*******************************  Beginning of update functions  **************************************/
 //=====================================================================================================//
 
