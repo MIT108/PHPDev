@@ -86,18 +86,21 @@ class Backend{
     }
 
     //function to verify if an id in a table exist
+    
     function isExistId($tableName,$key,$value){
         try{
 
-            $data = $this->db->query("select count(".$key.") from ".$tableName." where ".$key."= '$value' as count_value");
-            foreach ($data as $key) {
-                if($key['count_value'] > 0){
+            $data = $this->db->query("select count(".$key.") as count_value from ".$tableName." where ".$key."= '$value'");
+            foreach ($data as $row) {
+                if($row['count_value'] > 0){
                     return $this->returnExecQueryMessage("$value in $key found sucessfully", true);
+                }else{
+                    return $this->returnExecQueryMessage("Oops the $key $value doesn't exist in the $tableName table", false);
                 }
             }
 
         }catch(Exception $e){
-            return $this->returnExecQueryMessage("Oops the $key ".$value." doesn't exist in the $tableName table", false);
+            return $this->returnExecQueryMessage($e->getMessage(), false);
         }
     }
 
