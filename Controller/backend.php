@@ -125,12 +125,12 @@ class Backend{
             }
             $res = $this->insertSingleData($tableName,$columns[0],$values[0]);
             if($res['success']){
-                for ($i=1; $i < count($values); $i++) { 
+                for ($i=1; $i<count($values); $i++) {
+					try{
                     $response = $this->updateColumnData($tableName,$columns[$i],$values[$i],$this->getPrimaryKey($tableName),$lastId);
-                    if($response['success'])
-                        continue;
-                    else
-                        return $this->returnExecQueryMessage("Unexcepected server error",false);
+					}catch(Exception $e){
+						return $this->returnExecQueryMessage("Unexcepected server error",false);
+					}
                 }
             
             }
@@ -143,7 +143,12 @@ class Backend{
 
     //function to insert row data
     function insertRowData($tableName,$values){
-        $columns = $this->getTableColumns($tableName);
+        $column = $this->getTableColumns($tableName);
+		$columns = [];
+		for($i=1;$i<count($column);$i++){
+			$columns[$i] = $column[$i];
+		}
+			
         $this->insertMultipleData($tableName,$columns,$values);
     }
 
@@ -406,4 +411,5 @@ class Backend{
 }
 
 $b = new Backend();
+var_dump($b->insertMultipleData('users',["name","age","sex"],["latest btest","90","males"]));
 ?>
