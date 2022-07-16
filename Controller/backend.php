@@ -119,10 +119,14 @@ class Backend{
     function insertMultipleData($tableName,$columns,$values){
         if(count($columns)==count($values)){
             $allData = $this->findAll($tableName,null,null,'desc',1);
-            foreach($allData as $row){
-                $lastId = (int)$row[$this->getPrimaryKey($tableName)]+1;
-                break;
-            }
+           if(count($allData)>0){
+				foreach ($allData as $row) {
+					$lastId = (int)$row[$this->getPrimaryKey($tableName)] + 1;
+					break;
+				}
+			}else{
+				$lastId = 1;
+			}
             $res = $this->insertSingleData($tableName,$columns[0],$values[0]);
             if($res['success']){
                 for ($i=1; $i<count($values); $i++) {
